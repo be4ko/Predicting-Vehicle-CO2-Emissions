@@ -13,8 +13,8 @@ git clone https://github.com/yourusername/vehicle-co2-emission-prediction.git
 cd vehicle-co2-emission-prediction
 ```
 
-## Contributing
+## Contributors
 - AbubakerElsiddig
 - Mohamed Hamid
 - Jamal Bakr
-- Moahmmed Ali
+- Mohammed Ali
