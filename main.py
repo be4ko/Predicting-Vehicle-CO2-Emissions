@@ -131,3 +131,88 @@ y_pred = predict(X_test_gd, W, b)
 # Evaluate the model using R2 score
 r2 = r2_score(y_test, y_pred.flatten())
 print(f"R2 Score on the test set: {r2:.2f}")
+
+
+################# e) Logistic Regression Using Stochastic Gradient Descent #################
+
+# Selecting two features 
+features = data[["Fuel Consumption Comb (L/100 km)", "Engine Size(L)"]]
+
+# Selecting the target column (Emission class)
+target = data["Emission Class"]
+
+# Converting the categorical target values (Low, Moderate, High) into numerical values (0, 1, 2)
+encoder = LabelEncoder()
+target_encoded = encoder.fit_transform(target)
+
+print("Encoded Classes:", list(encoder.classes_))
+print("Example From The Encoded Targets:", target_encoded[:5])
+
+# Splitting data with 80% training, 20% test
+X_train, X_test, y_train, y_test = train_test_split(features, target_encoded, test_size=0.2, random_state=0)
+
+print("Training Features:", X_train.shape)
+print("Testing Features:", X_test.shape)
+
+# Standardize the features to have mean 0 and standard deviation 1
+scaler = StandardScaler()
+
+# Fit the scaler on the training data and transform both train and test sets
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+print("Scaled Features (Training):", X_train_scaled[:5])
+
+# Sigmoid Function
+def sigmoid(z):
+    return 1 / (1 + np.exp(-z))
+
+# Model Parameters
+m, n = X_train_scaled.shape  # Number of training samples and features
+theta = np.zeros(n)          # Start with weights of 0
+learning_rate = 0.01         # Learning rate for gradient descent
+iterations = 2000            # Number of training iterations
+
+# List to store cost
+cost_history = []
+
+# Perform training for the specified number of iterations
+for iteration in range(iterations):
+
+    random_index = np.random.randint(0, m)  # Randomly choose a sample index
+    xi = X_train_scaled[random_index, :]    # Features for the chosen sample
+    yi = y_train[random_index]              # True label for the chosen sample
+
+    z = np.dot(xi, theta)          # Weighted sum
+    prediction = sigmoid(z)        # Convert to probability
+
+    error = prediction - yi        # Difference between prediction and true label
+    gradient = error * xi          # Gradient for the weights
+    theta -= learning_rate * gradient  # Update weights using the gradient
+
+    
+    if iteration % 100 == 0:
+        cost = -yi * np.log(prediction) - (1 - yi) * np.log(1 - prediction)  # Binary cross-entropy loss
+        cost_history.append(cost)
+
+
+# Plotting the cost over time
+plt.plot(range(0, iterations, 100), cost_history)
+plt.xlabel("Iterations")
+plt.ylabel("Cost")
+plt.title("Cost Reduction Over Time")
+plt.show()
+
+# Using the trained weights to predict test set
+z_test = np.dot(X_test_scaled, theta)  # Weighted sums for the test set
+predicted_probabilities = sigmoid(z_test) 
+
+threshold = 0.5  # Default threshold used in logistic regression
+y_pred_class = predicted_probabilities >= threshold
+
+
+# Accuracy
+accuracy = np.mean(y_pred_class == y_test)
+print("The Accuracy in this Logistic Regression is: ", accuracy)
+
+
