@@ -2,7 +2,6 @@ import pandas
 import seaborn as sns
 import matplotlib.pyplot as plt
 
-
 data = pandas.read_csv("co2_emissions_data.csv")
 
 # Check whether there are missing values
